@@ -4,6 +4,11 @@ public class Card : MonoBehaviour
 {
     [SerializeField] private MeshRenderer _renderer;
 
+    public CardDataSession Session
+    { 
+        get { return _session; } 
+    }
+
     private CardDataSession _session;
 
     internal void Initialize(CardDataSession _toCardDataSession)

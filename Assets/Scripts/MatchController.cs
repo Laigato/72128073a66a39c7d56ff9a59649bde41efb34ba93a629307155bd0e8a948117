@@ -130,6 +130,8 @@ public class MatchController : MonoBehaviour
 
         Combo.Instance.OnComboUpdatedEvent += OnComboUpdated;
         Combo.Instance.ChainReset();
+
+        Score.Instance.ResetScore();
     }
 
     private IEnumerator OnOpenCardCoroutine(Card _toCard)
@@ -159,7 +161,7 @@ public class MatchController : MonoBehaviour
             {
                 //  Informs combo to chain
                 Combo.Instance.Chain();
-                
+                Score.Instance.Add(Mathf.FloorToInt(Combo.Instance.CurrentChainWeight));
                 yield break;
             }
 

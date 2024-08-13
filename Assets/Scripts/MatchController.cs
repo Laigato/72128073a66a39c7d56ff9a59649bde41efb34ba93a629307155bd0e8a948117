@@ -107,11 +107,11 @@ public class MatchController : MonoBehaviour
         //  Spawn Cards. Amount = Board.Width * Board.Height
         //  Insert CardData to Cards
 
-        StartCoroutine(StartingCoroutine(_cardTextureLoadTask));
+        StartCoroutine(StartingCoroutine(_cardsDataDistinct, _cardTextureLoadTask));
     }
 
 
-    private IEnumerator StartingCoroutine(List<Task> _tasks)
+    private IEnumerator StartingCoroutine(int _targetMatchCount, List<Task> _tasks)
     {
         var _task = Task.WhenAll(_tasks);
         do
@@ -120,10 +120,10 @@ public class MatchController : MonoBehaviour
         }
         while (_task.IsCompleted is false);
 
-        StartMatching();
+        StartMatching(_targetMatchCount);
     }
 
-    private void StartMatching()
+    private void StartMatching(int _targetMatchCount)
     {
         CardInputRaycaster.Instance.OnClickCard += OnOpenCard;
         CardInputRaycaster.Instance.canDetectInput = true;
@@ -132,6 +132,10 @@ public class MatchController : MonoBehaviour
         Combo.Instance.ChainReset();
 
         Score.Instance.ResetScore();
+
+        MatchGoal.Instance.OnGoalEvent += OnMatchComplete;
+        MatchGoal.Instance.SetGoal(_targetMatchCount);
+        MatchGoal.Instance.ResetProgress();
     }
 
     private IEnumerator OnOpenCardCoroutine(Card _toCard)
@@ -162,6 +166,9 @@ public class MatchController : MonoBehaviour
                 //  Informs combo to chain
                 Combo.Instance.Chain();
                 Score.Instance.Add(Mathf.FloorToInt(Combo.Instance.CurrentChainWeight));
+
+                MatchGoal.Instance.Add();
+
                 yield break;
             }
 
@@ -196,6 +203,11 @@ public class MatchController : MonoBehaviour
     private void OnComboUpdated(int _toLinkCount)
     {
 
+    }
+
+    private void OnMatchComplete()
+    {
+        Debug.Log("Complete");
     }
 
     #endregion

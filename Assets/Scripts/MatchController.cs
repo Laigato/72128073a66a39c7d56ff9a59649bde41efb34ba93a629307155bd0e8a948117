@@ -107,11 +107,11 @@ public class MatchController : MonoBehaviour
         //  Spawn Cards. Amount = Board.Width * Board.Height
         //  Insert CardData to Cards
 
-        StartCoroutine(LoadingCoroutine(_cardTextureLoadTask));
+        StartCoroutine(StartingCoroutine(_cardTextureLoadTask));
     }
 
 
-    private IEnumerator LoadingCoroutine(List<Task> _tasks)
+    private IEnumerator StartingCoroutine(List<Task> _tasks)
     {
         var _task = Task.WhenAll(_tasks);
         do
@@ -127,14 +127,7 @@ public class MatchController : MonoBehaviour
     {
         CardInputRaycaster.Instance.OnClickCard += OnOpenCard;
         CardInputRaycaster.Instance.canDetectInput = true;
-    }
 
-    private void OnOpenCard(Card _toCard)
-    {
-        //  Prevent flipping already face up card/ currently facing up.
-        if (_toCard.Session.IsFaceUp) return;
-
-        StartCoroutine(OnOpenCardCoroutine(_toCard));
     }
 
     private IEnumerator OnOpenCardCoroutine(Card _toCard)
@@ -179,6 +172,17 @@ public class MatchController : MonoBehaviour
 
     }
 
+    #region Private Event Callbacks
+
+    private void OnOpenCard(Card _toCard)
+    {
+        //  Prevent flipping already face up card/ currently facing up.
+        if (_toCard.Session.IsFaceUp) return;
+
+        StartCoroutine(OnOpenCardCoroutine(_toCard));
+    }
+
+    #endregion
     #region Utilities
 
     private static List<T> FisherYates<T>(List<T> _currentList)

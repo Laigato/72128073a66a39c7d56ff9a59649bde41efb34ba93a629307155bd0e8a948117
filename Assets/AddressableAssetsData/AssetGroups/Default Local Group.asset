@@ -77,6 +77,78 @@ MonoBehaviour:
     m_Address: tex_card_o
     m_ReadOnly: 0
     m_SerializedLabels: []
+  - m_GUID: ec22e4c01b44f7a42a38a998ca5e67f6
+    m_Address: card_a
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+  - m_GUID: c12388e08e8775747b969e2a5d4af900
+    m_Address: card_b
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+  - m_GUID: 726991cd8f984d148ac24d2d3d44da76
+    m_Address: card_c
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+  - m_GUID: 5592365b805f262408aabf85f7674c67
+    m_Address: card_d
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+  - m_GUID: 62426fc5dc703a74d825ccb241073096
+    m_Address: card_e
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+  - m_GUID: aade8535f48621741982c8dfd5a7fff0
+    m_Address: card_f
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+  - m_GUID: eab75009e2ef2bd4090ee118cc65ef37
+    m_Address: card_g
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+  - m_GUID: 64e05e80724072b409e451b3d87a9369
+    m_Address: card_h
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+  - m_GUID: d6cdc45cd0001744db9d8d1032b8cda7
+    m_Address: card_i
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+  - m_GUID: 44d86f58b75d48e4aa5d876369d0f14f
+    m_Address: card_j
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+  - m_GUID: c837e692baa71274c8f36f0b0e1a9e06
+    m_Address: card_k
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+  - m_GUID: 0a35c46835a1f984a97104eec2692097
+    m_Address: card_l
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+  - m_GUID: a0ce4354d1edd72429a01da95b1a7383
+    m_Address: card_m
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+  - m_GUID: ecd0bd767ee46d04e994d496d8167a60
+    m_Address: card_n
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+  - m_GUID: 32c4cbe4314f6214ba0269da9c3fab5b
+    m_Address: card_o
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+  - m_GUID: 42d8c82cb2d9e0a4683caf92b2c445a3
+    m_Address: board_6x5
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+  - m_GUID: f09f0dfc50182ee4aa39a01306f2beba
+    m_Address: board_3x2
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+  - m_GUID: 352089a882238064f9fd47028f3d1df3
+    m_Address: board_2x2
+    m_ReadOnly: 0
+    m_SerializedLabels: []
   m_ReadOnly: 0
   m_Settings: {fileID: 11400000, guid: 8aae2dbebae8d3a41a34025048957629, type: 2}
   m_SchemaSet:

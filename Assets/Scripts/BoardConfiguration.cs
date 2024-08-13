@@ -15,4 +15,6 @@ public class BoardConfiguration : ScriptableObject
     {
         get { return _height; }
     }
+
+    public const string PREF_KEY = "BoardKey";
 }

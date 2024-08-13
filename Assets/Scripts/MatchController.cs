@@ -125,10 +125,12 @@ public class MatchController : MonoBehaviour
                 y - _boardDiameterHeight + ((y - (_boardSpacingCountForHeight * HALF)) * spacing));
 
             _card.Initialize(_cardSession);
+            _card.Session.IsFaceUp = _cardSave.isFaceUp;
             _card.Session.X = x;
             _card.Session.Y = y;
             _card.name = $"{_cardSave.name} {x}, {y}";
             _card.transform.position = _cardPosition;
+            _card.transform.rotation = Quaternion.Euler(0, _cardSave.isFaceUp ? ROTATION_Y_FACEUP : ROTATION_X_FACEDOWN, 0);
             _cards.Add(_card);
         }
 

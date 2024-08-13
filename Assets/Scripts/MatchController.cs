@@ -128,6 +128,8 @@ public class MatchController : MonoBehaviour
         CardInputRaycaster.Instance.OnClickCard += OnOpenCard;
         CardInputRaycaster.Instance.canDetectInput = true;
 
+        Combo.Instance.OnComboUpdatedEvent += OnComboUpdated;
+        Combo.Instance.ChainReset();
     }
 
     private IEnumerator OnOpenCardCoroutine(Card _toCard)
@@ -148,12 +150,16 @@ public class MatchController : MonoBehaviour
         {
             _currentSelectedCard = null;
 
+            //  NOTE: Possible Bug
             //  Wait flip animation to complete before matching
             yield return _flipCoroutine;
 
             var _isMatch = _toCard.Session.CardData.itemName == _cacheCurrentSelectedCard.Session.CardData.itemName;
             if (_isMatch)
             {
+                //  Informs combo to chain
+                Combo.Instance.Chain();
+                
                 yield break;
             }
 
@@ -168,6 +174,9 @@ public class MatchController : MonoBehaviour
 
             _cacheCurrentSelectedCard.Session.IsFaceUp = false;
             _toCard.Session.IsFaceUp = false;
+            
+            //  Reset combo when fail once
+            Combo.Instance.ChainReset();
         }
 
     }
@@ -182,7 +191,13 @@ public class MatchController : MonoBehaviour
         StartCoroutine(OnOpenCardCoroutine(_toCard));
     }
 
+    private void OnComboUpdated(int _toLinkCount)
+    {
+
+    }
+
     #endregion
+
     #region Utilities
 
     private static List<T> FisherYates<T>(List<T> _currentList)

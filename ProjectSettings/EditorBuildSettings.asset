@@ -6,7 +6,13 @@ EditorBuildSettings:
   serializedVersion: 2
   m_Scenes:
   - enabled: 1
-    path: Assets/Scenes/SampleScene.unity
+    path: Assets/Scenes/MainMenuScene.unity
+    guid: dbfbaa07758ad5f42bd88ce46b7107fc
+  - enabled: 1
+    path: Assets/Scenes/MatchGeneratorScene.unity
+    guid: 4b48206d0c5c4b64d8fe52d7ae254fac
+  - enabled: 1
+    path: Assets/Scenes/MatchScene.unity
     guid: 2cda990e2423bbf4892e6590ba056729
   m_configObjects:
     com.unity.addressableassets: {fileID: 11400000, guid: 25e51e816930ef54387500d3410d7362, type: 2}

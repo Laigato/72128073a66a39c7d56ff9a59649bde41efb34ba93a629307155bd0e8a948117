@@ -17,7 +17,7 @@ public class SaveManager : MonoBehaviour
     public void Save(SaveConfiguration _configuration, object _toData)
     {
         var _JSON = JsonUtility.ToJson(_toData, true);
-
+        
         using (StreamWriter _streamWriter = new StreamWriter(Application.persistentDataPath + $"/{_configuration.nameFile}.json"))
         {
             _streamWriter.WriteLine(_JSON);
@@ -50,7 +50,8 @@ public class SaveManager : MonoBehaviour
 
     public void DeleteSave(SaveConfiguration _configuration)
     {
-
+        var _path = Application.persistentDataPath + $"/{_configuration.nameFile}.json";
+        File.Delete(_path);
     }
 
     public bool IsExist(SaveConfiguration _configuration)

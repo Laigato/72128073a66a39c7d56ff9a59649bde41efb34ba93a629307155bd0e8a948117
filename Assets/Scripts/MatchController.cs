@@ -4,11 +4,11 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.AddressableAssets;
+using UnityEngine.SceneManagement;
 
 [RequireComponent(typeof(AudioSource))]
 public class MatchController : MonoBehaviour
 {
-    [SerializeField] private BoardConfiguration _testBoard;
     [SerializeField] private List<CardData> _cardDataList = new();
 
     [Header("References")]
@@ -17,6 +17,7 @@ public class MatchController : MonoBehaviour
     [SerializeField] private Material _cardMaterialPrefab;
 
     [Header("Settings")]
+    [SerializeField] private SaveConfiguration _saveConfigurationForMatch;
     [Space]
     [SerializeField, Min(0)] private float spacing = 0f;
     [Space]
@@ -35,50 +36,79 @@ public class MatchController : MonoBehaviour
     private const float ROTATION_Y_FACEUP = 180f;
     private const float ROTATION_X_FACEDOWN = 0f;
 
+    private readonly Dictionary<string, CardData> _cardDataDictionary = new();
+
     private AudioSource _sfxSource;
     private Card _currentSelectedCard;
+    private List<Card> _currentGeneratedCards;
 
     private void Awake()
     {
         _sfxSource = GetComponent<AudioSource>();
+
+        //  Create Dictionary of CardData with itemName as Key for easy reference without search
+        foreach (var _cardData in _cardDataList)
+        {
+            _cardDataDictionary.Add(_cardData.name, _cardData);
+        }
     }
 
     private void Start()
     {
+        var _isExists = SaveManager.Instance.IsExist(_saveConfigurationForMatch);
+        if (_isExists is not true)
+        {
+            SceneManager.LoadScene("MainMenuScene");
+            return;
+        }
+
+        var _saveMatch = SaveManager.Instance.Load(_saveConfigurationForMatch) as SaveMatch;
+
+        SaveManager.Instance.OnLoadEvent += OnLoadFile;
+        StartCoroutine(GenerateBoardFromSaveMatch(_saveMatch));
+    }
+
+    private IEnumerator GenerateBoardFromSaveMatch(SaveMatch _saveMatch)
+    {
+        var _operation = Addressables.LoadAssetAsync<BoardConfiguration>(_saveMatch.currentBoard);
+
+        yield return _operation;
+
+        var _configuration = _operation.Result;
+
         //  Fetch Board
-        var _cardsCount = _testBoard.Width * _testBoard.Height;
+        var _cardsCount = _configuration.Width * _configuration.Height;
 
         //  Note CardSize = 1
-        var _worldWidth = _testBoard.Width + (spacing * (_testBoard.Width - 1));
-        var _worldHeight = _testBoard.Height + (spacing * (_testBoard.Height - 1));
+        var _worldWidth = _configuration.Width + (spacing * (_configuration.Width - 1));
+        var _worldHeight = _configuration.Height + (spacing * (_configuration.Height - 1));
 
         //  Resize Camera based on board dimension
         var _ratio = Screen.width / (float)Screen.height;
         var _orthoWidth = _worldWidth / (_ratio - 1) * HALF;
         Camera.main.orthographicSize = _orthoWidth;
 
-        //  Generate Card
+        //  Calculate unique cards (matches without duplicate)
         var _cardsDataDistinct = Mathf.FloorToInt(_cardsCount * HALF);
 
-        //  Shuffle CardData.
-        //  Create Save
+        var _boardSpacingCountForWidth = _configuration.Width - 1;
+        var _boardSpacingCountForHeight = _configuration.Height - 1;
+        var _boardDiameterWidth = (_configuration.Width + TO_INDEX) * HALF;
+        var _boardDiameterHeight = (_configuration.Height + TO_INDEX) * HALF;
 
-        //  Load Save
-
-        //  Generate Card
         var _cards = new List<Card>();
         var _cardTextureLoadTask = new List<Task>();
-        for (int i = 0; i < _cardsDataDistinct; i++)
+
+        for (int i = 0; i < _cardsCount; i++)
         {
-            var _cardData = _cardDataList[i];
-            var _card1 = Instantiate(_cardPrefab, _cardsParent);
-            var _card2 = Instantiate(_cardPrefab, _cardsParent);
+            var _cardSave = _saveMatch.cards[i];
+            var _cardData = _cardDataDictionary[_cardSave.name];
+            var _card = Instantiate(_cardPrefab, _cardsParent);
 
             var _cardMaterial = Instantiate(_cardMaterialPrefab);
-            var _cardSession1 = new CardDataSession(_cardMaterial, _cardData);
-            var _cardSession2 = new CardDataSession(_cardMaterial, _cardData);
+            var _cardSession = new CardDataSession(_cardMaterial, _cardData);
 
-            //  Loading texture from Addressables using CardData, then assign FrontTex
+            //  Loading texture from Addressables using CardData, then assign BackTex
             var _processLoad = Addressables.LoadAssetAsync<Texture2D>(_cardData.itemTextureName);
             _processLoad.Completed += (_operation) =>
             {
@@ -87,41 +117,25 @@ public class MatchController : MonoBehaviour
             };
             _cardTextureLoadTask.Add(_processLoad.Task);
 
-            _card1.Initialize(_cardSession1);
-            _card2.Initialize(_cardSession2);
-            _cards.Add(_card1);
-            _cards.Add(_card2);
-        }
+            var x = i % _configuration.Width;
+            var y = Mathf.FloorToInt(i / _configuration.Width);
 
-        //  Shuffle Generated Cards
-        var _cardsShuffled = FisherYates(_cards);
-
-        var _boardSpacingCountForWidth = _testBoard.Width - 1;
-        var _boardSpacingCountForHeight = _testBoard.Height - 1;
-        var _boardDiameterWidth = (_testBoard.Width + TO_INDEX) * HALF;
-        var _boardDiameterHeight = (_testBoard.Height + TO_INDEX) * HALF;
-
-        //  Rearrange card position & initialize
-        for (int i = 0; i < _cards.Count; i++)
-        {
-            var x = i % _testBoard.Width;
-            var y = Mathf.FloorToInt(i / _testBoard.Width);
-
-            var _card = _cardsShuffled[i];
             var _cardPosition = new Vector2(
                 x - _boardDiameterWidth + ((x - (_boardSpacingCountForWidth * HALF)) * spacing),
                 y - _boardDiameterHeight + ((y - (_boardSpacingCountForHeight * HALF)) * spacing));
 
-            _card.name = $"Card {x}, {y}";
+            _card.Initialize(_cardSession);
+            _card.Session.X = x;
+            _card.Session.Y = y;
+            _card.name = $"{_cardSave.name} {x}, {y}";
             _card.transform.position = _cardPosition;
+            _cards.Add(_card);
         }
 
-        //  Spawn Cards. Amount = Board.Width * Board.Height
-        //  Insert CardData to Cards
+        _currentGeneratedCards = _cards;
 
         StartCoroutine(StartingCoroutine(_cardsDataDistinct, _cardTextureLoadTask));
     }
-
 
     private IEnumerator StartingCoroutine(int _targetMatchCount, List<Task> _tasks)
     {
@@ -209,6 +223,18 @@ public class MatchController : MonoBehaviour
 
     #region Private Event Callbacks
 
+    private void OnLoadFile(object _toData)
+    {
+        foreach (Transform _item in _cardsParent)
+        {
+            Destroy(_item.gameObject);
+        }
+        _currentSelectedCard = default;
+        _currentGeneratedCards.Clear();
+
+        StartCoroutine(GenerateBoardFromSaveMatch(_toData as SaveMatch));
+    }
+
     private void OnOpenCard(Card _toCard)
     {
         //  Prevent flipping already face up card/ currently facing up.
@@ -225,6 +251,40 @@ public class MatchController : MonoBehaviour
     private void OnMatchComplete()
     {
         _sfxSource.PlayOneShot(_sfxComplete);
+    }
+
+    #endregion
+
+    #region Unity Event Callback
+
+    public void INPUT_Save(SaveConfiguration _configuration)
+    {
+        var _saveMatch = new SaveMatch();
+        _saveMatch.currentBoard = PlayerPrefs.GetString(BoardConfiguration.PREF_KEY);
+        _saveMatch.currentScore = Score.Instance.CurrentScore;
+        _saveMatch.currentMatch = MatchGoal.Instance.CurrentMatches;
+        _saveMatch.currentCombo = Combo.Instance.CurrentChain;
+        
+        for (int i = 0; i < _currentGeneratedCards.Count; i++)
+        {
+            var _currentCard = _currentGeneratedCards[i];
+            var _currentSaveMatchCard = new SaveMatch.Card()
+            {
+                name = _currentCard.Session.CardData.name,
+                x = _currentCard.Session.X,
+                y = _currentCard.Session.Y,
+                isFaceUp = _currentCard.Session.IsFaceUp
+            };
+
+            _saveMatch.cards.Add(_currentSaveMatchCard);
+        }
+
+        SaveManager.Instance.Save(_configuration, _saveMatch);
+    }
+
+    public void INPUT_Load(SaveConfiguration _configuration)
+    {
+        SaveManager.Instance.Load(_configuration);
     }
 
     #endregion

@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.AddressableAssets;
 
+[RequireComponent(typeof(AudioSource))]
 public class MatchController : MonoBehaviour
 {
     [SerializeField] private BoardConfiguration _testBoard;
@@ -22,6 +23,11 @@ public class MatchController : MonoBehaviour
     [SerializeField, Min(0.1f)] private float _flipUpDuration;
     [SerializeField, Min(0.1f)] private float _flipDownDuration;
     [SerializeField, Min(0.1f)] private float _flipInterval;
+    [Space]
+    [SerializeField] private AudioClip _sfxFlip;
+    [SerializeField] private AudioClip _sfxCorrect;
+    [SerializeField] private AudioClip _sfxIncorrect;
+    [SerializeField] private AudioClip _sfxComplete;
 
     private const float HALF = 0.5f;
     private const int TO_INDEX = -1;
@@ -29,7 +35,13 @@ public class MatchController : MonoBehaviour
     private const float ROTATION_Y_FACEUP = 180f;
     private const float ROTATION_X_FACEDOWN = 0f;
 
+    private AudioSource _sfxSource;
     private Card _currentSelectedCard;
+
+    private void Awake()
+    {
+        _sfxSource = GetComponent<AudioSource>();
+    }
 
     private void Start()
     {
@@ -144,7 +156,8 @@ public class MatchController : MonoBehaviour
         var _hasCache = _cacheCurrentSelectedCard is not null;
 
         _currentSelectedCard = _toCard;
-        
+        _sfxSource.PlayOneShot(_sfxFlip);
+
         //  Flip Up
         var _flipCoroutine = StartCoroutine(LerpCoroutine(_flipUpDuration, ROTATION_X_FACEDOWN, ROTATION_Y_FACEUP, (_value) =>
         {
@@ -163,6 +176,8 @@ public class MatchController : MonoBehaviour
             var _isMatch = _toCard.Session.CardData.itemName == _cacheCurrentSelectedCard.Session.CardData.itemName;
             if (_isMatch)
             {
+                _sfxSource.PlayOneShot(_sfxCorrect);
+
                 //  Informs combo to chain
                 Combo.Instance.Chain();
                 Score.Instance.Add(Mathf.FloorToInt(Combo.Instance.CurrentChainWeight));
@@ -172,6 +187,8 @@ public class MatchController : MonoBehaviour
                 yield break;
             }
 
+            _sfxSource.PlayOneShot(_sfxIncorrect);
+            
             //  Not a match, flip back to face down
             yield return new WaitForSeconds(_flipInterval);
 
@@ -207,7 +224,7 @@ public class MatchController : MonoBehaviour
 
     private void OnMatchComplete()
     {
-        Debug.Log("Complete");
+        _sfxSource.PlayOneShot(_sfxComplete);
     }
 
     #endregion

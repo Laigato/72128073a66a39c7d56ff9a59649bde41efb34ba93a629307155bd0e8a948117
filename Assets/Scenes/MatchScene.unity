@@ -390,10 +390,10 @@ MonoBehaviour:
   _flipUpDuration: 0.4
   _flipDownDuration: 0.2
   _flipInterval: 1
-  _sfxFlip: {fileID: 0}
-  _sfxCorrect: {fileID: 0}
-  _sfxIncorrect: {fileID: 0}
-  _sfxComplete: {fileID: 0}
+  _sfxFlip: {fileID: 8300000, guid: 1c8f491df469dd542b5709535dd71049, type: 3}
+  _sfxCorrect: {fileID: 8300000, guid: 595a20aa8ccc2ca40ba2908d3b901918, type: 3}
+  _sfxIncorrect: {fileID: 8300000, guid: 4bf4049f158b2f24ba481e07183387ec, type: 3}
+  _sfxComplete: {fileID: 8300000, guid: 09f9240a457b3cd478a59d5fe6cca108, type: 3}
 --- !u!4 &398496236
 Transform:
   m_ObjectHideFlags: 0

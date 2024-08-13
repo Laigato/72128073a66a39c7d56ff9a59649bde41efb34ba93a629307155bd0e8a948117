@@ -32,7 +32,7 @@ public class Combo : MonoBehaviour
     public void Chain()
     {
         CurrentChain++;
-        CurrentChainWeight = Mathf.Pow(_chainWeightPerLink, 1 - CurrentChain);
+        CurrentChainWeight = Mathf.Pow(_chainWeightPerLink, CurrentChain - 1);
         _combo.text = CurrentChain.ToString();
         try
         {
@@ -45,7 +45,7 @@ public class Combo : MonoBehaviour
     public void ChainReset()
     {
         CurrentChain = default;
-        CurrentChainWeight = Mathf.Pow(_chainWeightPerLink, 1 - CurrentChain);
+        CurrentChainWeight = Mathf.Pow(_chainWeightPerLink, CurrentChain - 1);
         _combo.text = CurrentChain.ToString();
         try
         {

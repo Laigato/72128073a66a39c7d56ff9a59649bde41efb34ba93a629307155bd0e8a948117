@@ -223,6 +223,12 @@ public class MatchController : MonoBehaviour
 
     }
 
+    private IEnumerator GoToMainMenuCoroutine()
+    {
+        yield return new WaitForSeconds(1f);
+        SceneManager.LoadScene("MainMenuScene");
+    }
+
     #region Private Event Callbacks
 
     private void OnLoadFile(object _toData)
@@ -253,6 +259,10 @@ public class MatchController : MonoBehaviour
     private void OnMatchComplete()
     {
         _sfxSource.PlayOneShot(_sfxComplete);
+
+        //  Clear Match save to prevent player repeating thee level 
+        SaveManager.Instance.DeleteSave(_saveConfigurationForMatch);
+        StartCoroutine(GoToMainMenuCoroutine());
     }
 
     #endregion

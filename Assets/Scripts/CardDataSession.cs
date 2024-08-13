@@ -8,6 +8,9 @@ public class CardDataSession
     public CardData CardData
     { get; private set; }
 
+    public bool IsFaceUp 
+    { get; set; }
+
     internal CardDataSession(Material _materialShader, CardData _cardData)
     {
         Material = _materialShader;
